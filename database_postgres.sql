@@ -1,122 +1,110 @@
-BEGIN;
-
-
-CREATE TABLE IF NOT EXISTS public.address
-(
-    address_id integer NOT NULL,
-    city character varying(45) NOT NULL,
-    street character varying(45) NOT NULL,
-    "number" character varying(45),
-    zip character varying(45),
-    PRIMARY KEY (address_id)
+create table if not exists "user" (
+	"user_id"		serial		primary key not null,
+	"name"			varchar(20)	not null,
+	"surname"		varchar(20)	not null,
+	"date_of_birth"	date		not null,
+	"status"		varchar(20) not null,
+	"sex"			varchar(10),
+	"password"		varchar(45)
 );
 
-CREATE TABLE IF NOT EXISTS public.contact
-(
-    contact_id integer NOT NULL,
-    faculty_email character varying(45) NOT NULL,
-    primary_phone character varying(45) NOT NULL,
-    PRIMARY KEY (contact_id)
+create table if not exists "address" (
+	"address_id"	serial		primary key not null,
+	"city"			varchar(45) not null,
+	"street"		varchar(45) not null,
+	"number"		varchar(45),
+	"zip"			varchar(45)
 );
 
-CREATE TABLE IF NOT EXISTS public.course
-(
-    course_id integer NOT NULL,
-    course_name character varying(45) NOT NULL,
-    course_location character varying(45) NOT NULL,
-    course_duration integer NOT NULL,
-    PRIMARY KEY (course_id)
+create table if not exists "enrolment" (
+	"enrolment_id"	serial		primary key not null,
+	"start_date"	date		not null,
+	"end_date"		date,
+	"user_id"		integer	not null,
+	foreign key ("user_id")		references "user"
 );
 
-CREATE TABLE IF NOT EXISTS public.course_grade
-(
-    course_grade_id integer NOT NULL,
-    test_grade character varying(8) NOT NULL,
-    lab_grade character varying(8) NOT NULL,
-    final_grade character varying(8) NOT NULL,
-    PRIMARY KEY (course_grade_id)
+create table if not exists "contact" (
+	"contact_id"	serial		primary key not null,
+	"faculty_email"	varchar(45)	not null,
+	"primary_phone"	varchar(45)	not null,
+	"user_id"		integer		not null,
+	foreign key ("user_id")	references "user"
 );
 
-CREATE TABLE IF NOT EXISTS public.enrolment
-(
-    enrolment_id integer NOT NULL,
-    start_date date NOT NULL,
-    end_date date,
-    user_id integer NOT NULL,
-    PRIMARY KEY (enrolment_id)
+create table if not exists "salary" (
+	"salary_id"		serial		primary key not null,
+	"salary_type"	varchar(45)	not null,
+	"salary_amount"	integer		not null
 );
 
-CREATE TABLE IF NOT EXISTS public.role
-(
-    role_id integer NOT NULL,
-    role_type character varying(45) NOT NULL,
-    PRIMARY KEY (role_id)
+create table if not exists "scholarship" (
+	"scholarship_id"	serial		primary key not null,
+	"scholarship_type"	varchar(45) not null
 );
 
-CREATE TABLE IF NOT EXISTS public.salary
-(
-    salary_id integer NOT NULL,
-    salary_type character varying(45) NOT NULL,
-    salary_amount integer NOT NULL,
-    PRIMARY KEY (salary_id)
+create table if not exists "user_has_salary" (
+	"user_id"		integer		not null,
+	"salary_id"		integer		not null,
+	foreign key	("user_id")		references "user",
+	foreign key ("salary_id")	references "salary"
 );
 
-CREATE TABLE IF NOT EXISTS public.scholarship
-(
-    scholarship_id integer NOT NULL,
-    scholarship_type character varying(45) NOT NULL,
-    PRIMARY KEY (scholarship_id)
+create table if not exists "course_grade" (
+	"course_grade_id"	serial		primary key not null,
+	"test_grade"		varchar(8) 	not null,
+	"lab_grade"			varchar(8)	not null,
+	"final_grade"		varchar(8)	not null
 );
 
-CREATE TABLE IF NOT EXISTS public."user"
-(
-    user_id integer NOT NULL,
-    name character varying(20) NOT NULL,
-    surname character varying(20) NOT NULL,
-    date_of_birth date NOT NULL,
-    status character varying(20) NOT NULL,
-    sex character varying(10),
-    password character varying(45),
-    PRIMARY KEY (user_id)
+create table if not exists "course" (
+	"course_id"			serial		primary key not null,
+	"course_name"		varchar(45)	not null,
+	"course_location"	varchar(45)	not null,
+	"course_duration"	integer 	not null
 );
 
-CREATE TABLE IF NOT EXISTS public.user_has_address
-(
-    user_id integer NOT NULL,
-    address_id integer NOT NULL,
-    address_type character varying(45) NOT NULL
+create table if not exists "role" (
+	"role_id"			serial		primary key not null,
+	"role_type"			varchar(45)	not null
 );
 
-CREATE TABLE IF NOT EXISTS public.user_has_course
-(
-    user_id integer NOT NULL,
-    course_id integer NOT NULL,
-    user_feedback character varying(45)
+create table if not exists "user_has_role" (
+	"user_id"		integer		not null,
+	"role_id"		integer		not null,
+	"start_date"	date		not null,
+	"end_date"		date,
+	foreign key ("user_id")		references "user",
+	foreign key ("role_id")		references "role"
 );
 
-CREATE TABLE IF NOT EXISTS public.user_has_grade
-(
-    user_id integer NOT NULL,
-    course_grade_id integer NOT NULL,
-    "timestamp" date NOT NULL
+create table if not exists "user_has_course" (
+	"user_id"	integer			not null,
+	"course_id" integer			not null,
+	"user_feedback"	varchar(150),
+	foreign key ("user_id")		references "user",
+	foreign key ("course_id")	references "course"
 );
 
-CREATE TABLE IF NOT EXISTS public.user_has_role
-(
-    user_id integer NOT NULL,
-    role_id integer NOT NULL,
-    start_date date NOT NULL,
-    end_date date
+create table if not exists "user_has_grade" (
+	"user_id"			integer	not null,
+	"course_grade_id"	integer	not null,
+	"timestamp"			date not null,
+	foreign key ("user_id")			references "user",
+	foreign key ("course_grade_id")	references "course_grade"
 );
 
-CREATE TABLE IF NOT EXISTS public.user_has_salary
-(
-    user_id integer NOT NULL,
-    salary_id integer NOT NULL
+create table if not exists "user_has_scholarship" (
+	"user_id"			integer	not null,
+	"scholarship_id"	integer,
+	foreign key	("user_id")			references "user",
+	foreign key ("scholarship_id")	references "scholarship"
 );
 
-CREATE TABLE IF NOT EXISTS public.user_has_scholarship
-(
-    user_id integer NOT NULL,
-    scholarship_id integer
+create table if not exists "user_has_address" (
+	"user_id"		integer 	not null,
+	"address_id"	integer		not null,
+	"address_type"	varchar(45)	not null,
+	foreign key ("user_id")		references "user",
+	foreign key ("address_id")	references "address"
 );
